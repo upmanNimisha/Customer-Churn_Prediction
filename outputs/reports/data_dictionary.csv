@@ -1,0 +1,22 @@
+field,expected_type,description,verification_status
+customerID,string,Customer identifier,Provisional - verify uniqueness
+gender,category,Recorded gender category,Provisional - verify source definition
+SeniorCitizen,integer flag,Recorded senior citizen indicator,Provisional - verify coding and definition
+Partner,category,Recorded partner indicator,Provisional - verify source definition
+Dependents,category,Recorded dependents indicator,Provisional - verify source definition
+tenure,numeric,Length of customer relationship,Provisional - verify units and observation timing
+PhoneService,category,Phone service subscription status,Provisional - verify allowed values
+MultipleLines,category,Multiple phone line subscription status,Provisional - retain no phone service category
+InternetService,category,Internet service type,Provisional - verify allowed values
+OnlineSecurity,category,Online security subscription status,Provisional - retain no internet service category
+OnlineBackup,category,Online backup subscription status,Provisional - retain no internet service category
+DeviceProtection,category,Device protection subscription status,Provisional - retain no internet service category
+TechSupport,category,Technical support subscription status,Provisional - retain no internet service category
+StreamingTV,category,Streaming TV subscription status,Provisional - retain no internet service category
+StreamingMovies,category,Streaming movies subscription status,Provisional - retain no internet service category
+Contract,category,Contract term category,Provisional - verify allowed values
+PaperlessBilling,category,Paperless billing status,Provisional - verify allowed values
+PaymentMethod,category,Recorded payment method,Provisional - verify allowed values
+MonthlyCharges,numeric,Monthly billed charge,Provisional - verify currency and timing
+TotalCharges,numeric,Accumulated billed charges,Provisional - inspect blanks and verify currency and timing
+Churn,category,Recorded churn outcome,Provisional - verify label definition and observation window
