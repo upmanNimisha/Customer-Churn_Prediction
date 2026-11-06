@@ -284,6 +284,8 @@ CustomerChurnPrediction/
 
 Use a notebook-first data science workflow. Keep data loading, auditing, manipulation, cleaning, feature preparation, visualisation, and modelling directly in `notebooks/churnprediction.ipynb`, with Markdown explanations and visible aggregate results. Run cells interactively in VS Code using the project kernel, and keep the notebook reproducible from a fresh kernel by running cells from top to bottom.
 
+Write Python for a reader who has strong software engineering, SQL, business, and planning skills but is new to Python libraries and data engineering. Phase 1 uses 43 focused code cells, each at most 15 lines, with descriptive variables, basic loops, and SQL parallels for unfamiliar pandas operations. Each step has nearby Markdown explaining its purpose and intermediate operations. Prefer clear intermediate steps over dense expressions; keep the analytical checks and business reasoning rigorous.
+
 Keep separate Python scripts to a minimum and use helpers only for a concrete need that cannot be handled clearly in the notebook. Permanent notebook generation or execution/rewrite scripts are not part of this workflow. For agent verification, temporary Python scripts may execute the existing notebook cells and check outputs; delete these scripts when verification is complete instead of controlling the user's computer. Project contributor instructions are recorded in [AGENTS.md](AGENTS.md).
 
 ## Current setup and execution
@@ -296,7 +298,7 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Open `notebooks/churnprediction.ipynb` in VS Code, select the `.venv` kernel, and run the cells in order. Launch from the repository root or a directory inside it; the notebook locates the raw CSV using project-relative paths. Current executable cells audit the raw data, verify its checksum, and refresh the aggregate data dictionary; they do not modify the source file or generate cleaned data. Use **Restart Kernel**, then **Run All**, to check that the notebook works without state left over from earlier interactive runs. Save the notebook to retain the reviewed outputs. No separate Python runner is required.
+Open `notebooks/churnprediction.ipynb` in VS Code, select the `.venv` kernel, and run the cells in order. Launch from the repository root or a directory inside it; the notebook locates the raw CSV using project-relative paths. Current executable cells audit the raw data, verify its checksum, and read the reviewed data dictionary without rewriting it. They do not export files or generate cleaned data. Use **Restart Kernel**, then **Run All**, to check that the notebook works without state left over from earlier interactive runs. Save the notebook to retain the reviewed outputs. No separate Python runner is required.
 
 Use `outputs/reports/analysis_log.md` to record decisions and findings as work progresses. Each notebook phase has a Markdown planning section, so future work can be added without placeholder executable code.
 

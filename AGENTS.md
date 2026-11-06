@@ -1,11 +1,10 @@
-# Project priorities
+# Project rules and priorities
 
-- Read local `rules.md` when present and follow its workflow and simplicity rules.
-- Before writing any code, ask: "Is it necessary to make this so complex?" Choose the simplest clear solution that meets the requirement.
-- Use a notebook-first data science workflow. Keep data loading, auditing, manipulation, cleaning, feature preparation, visualisation, and modelling directly in readable `.ipynb` cells.
-- Treat `notebooks/churnprediction.ipynb` as the primary analysis workspace. Organise work with Markdown explanations, focused code cells, and visible aggregate results.
-- Keep notebooks runnable from a fresh kernel by running cells from top to bottom using the project `.venv` kernel. For agent verification, use temporary Python scripts rather than taking over the user's computer; run the checks and delete the temporary scripts once verification is complete.
-- Keep separate Python scripts to a minimum. Add a helper only when it serves a concrete need that is awkward to handle clearly in the notebook; keep analytical logic visible in the notebook.
-- Do not introduce permanent scripts that generate notebooks or execute and rewrite notebooks as the project's workflow. Temporary validation scripts may execute existing notebook cells and refresh their saved outputs; analytical logic must remain in the notebook.
-- Preserve raw data and existing audit evidence. Export derived tables, metadata, and charts from notebook cells when needed, using the documented project paths.
-- Do not commit or push unless the user explicitly requests it. A request for a commit message authorises only the message.
+- **Question complexity before coding.** Ask: "Is it necessary to make this so complex?" Choose the simplest clear solution that meets the requirement. Add helpers, abstractions, dependencies, or extra steps only for a concrete benefit.
+- **Write beginner-friendly Python.** Assume the reader has senior software engineering, SQL, business, and planning skills but is new to Python libraries and data engineering. Use descriptive variables, basic loops, and explicit intermediate steps. Avoid dense method chains, nested expressions, comprehensions, and unnecessary abstractions when a straightforward version is clearer. Keep the analytical and business reasoning rigorous.
+- **Prioritise notebooks.** Use `notebooks/churnprediction.ipynb` as the primary workspace. Keep data loading, auditing, manipulation, cleaning, feature preparation, visualisation, and modelling directly in `.ipynb` cells. Minimise separate Python helpers; introduce one only for a clear need that is awkward to handle in the notebook.
+- **Give each cell one purpose.** Separate setup, calculations, displays, and validation when they answer different questions. Prefer roughly 5-15 lines per cell where practical, keeping loops and conditionals intact. Add Markdown before each step and comments for intermediate operations, explaining what they do and why they are needed. Use SQL parallels for unfamiliar pandas concepts.
+- **Prefer direct checks.** Use familiar summaries such as `value_counts()`, `isna().sum()`, and simple column assignments. Do not rebuild reviewed documentation or create custom formatting tables when displaying the result directly answers the question. Keep output focused while preserving necessary validation.
+- **Verify without computer control.** Keep notebooks runnable from a fresh project `.venv` kernel, top to bottom. For agent checks, use temporary Python scripts to execute existing cells and verify results; delete the scripts and temporary check artifacts after verification. They may refresh saved outputs, but analytical logic stays in the notebook. Do not add permanent notebook generation or execution/rewrite scripts to the workflow.
+- **Preserve data and evidence.** Keep raw data and existing audit evidence intact. Show aggregate results; export derived tables, metadata, and charts from notebook cells only when needed, using documented project paths.
+- **Commit and push only when requested.** A request for a commit message authorises only the message.

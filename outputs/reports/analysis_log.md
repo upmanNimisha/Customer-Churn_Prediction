@@ -23,7 +23,7 @@ Step 1 completion checks were met through documented evidence and explicit unres
 
 ### Step 2: Audit evidence
 
-Executed on 6 November 2026 (Asia/Calcutta) using Python 3.14.6, pandas 3.1.1, and NumPy 2.5.4. See the executed [notebook](../../notebooks/churnprediction.ipynb) for all seven code cells, field-level completeness, category frequencies, numeric checks, and preservation assertions. The [data dictionary](data_dictionary.csv) now covers all 21 fields with observed types, values/ranges, missingness, roles, units/coding notes, and verification status. Source semantics remain explicitly unverified.
+Executed on 6 November 2026 (Asia/Calcutta) using Python 3.14.6, pandas 3.1.1, and NumPy 2.5.4. See the executed [notebook](../../notebooks/churnprediction.ipynb) for field-level completeness, category frequencies, numeric checks, and preservation assertions. The original seven code cells were first reorganised into 19 beginner-friendly cells and now into 43 single-purpose cells with the same audit results; see the readability review below. The [data dictionary](data_dictionary.csv) covers all 21 fields with observed types, values/ranges, missingness, roles, units/coding notes, and verification status. Source semantics remain explicitly unverified.
 
 **Input:** `datasets/TelecomChurnData.csv`
 
@@ -54,7 +54,7 @@ Loading uses UTF-8, comma delimiter, and the first row as header. The inferred v
 | Provisional churn prevalence | 1,869 / 7,043 = 26.536987%, displayed as 26.54%; retained: 5,174 | All 7,043 eligible customers | Recorded-label prevalence only; not monthly churn or a future-period forecast |
 | Source preservation | SHA-256 unchanged before/after execution; both in-memory raw views equal their snapshots | 0 source changes | No imputation, capping, cleaning, or customer-level export performed |
 
-**Reproduction:** Open `notebooks/churnprediction.ipynb` in VS Code, select the project's `.venv` kernel, restart the kernel, and run all cells from top to bottom. Review results and save the notebook to retain its outputs. The final audit cell refreshes the aggregate data dictionary and checks source preservation. During Step 2 verification, a second execution reproduced the dictionary byte-for-byte and preserved the raw checksum.
+**Reproduction:** Open `notebooks/churnprediction.ipynb` in VS Code, select the project's `.venv` kernel, restart the kernel, and run all cells from top to bottom. Review results and save the notebook to retain its outputs. The final audit cells read the reviewed dictionary, check field coverage, and confirm source preservation without exporting files. During the original Step 2 verification, a second execution reproduced the dictionary byte-for-byte; the latest simplified notebook leaves this reviewed artifact unchanged.
 
 **Workflow preference (6 November 2026):** The user prioritises a notebook-first data science workflow, with data manipulation and analysis implemented directly in `.ipynb` cells and minimal separate Python scripts. The optional permanent external runner was removed. Users can run the notebook interactively; agent verification uses temporary Python scripts that are deleted after checking outputs, without computer control. Existing audit code and evidence remain in the notebook. See [project priorities](../../AGENTS.md).
 
@@ -75,6 +75,23 @@ Completed on 6 November 2026. The [quality report](data_quality_report.md) conso
 **Phase 2 acceptance checks:** Preserve raw SHA-256 and the exact set of 7,043 IDs; retain 1,869 Yes/ones and 5,174 No/zeros; expect zero exclusions, zero missing MonthlyCharges, and 11 missing TotalCharges/missing-total flags. Preserve categories, service consistency, and finite numeric ranges. Reconcile bands and exported tables to the same customer and churn counts. Document actual transformations and export paths in the notebook and log.
 
 **Phase 1 completion:** Business scope, data grain, label coding versus unresolved outcome meaning, quality evidence, issue treatments, limitations, and Phase 2 acceptance criteria are documented. Phase 2 implementation has not started.
+
+### Phase 1 readability review
+
+The user requested Python written from the perspective of a senior software engineer with strong SQL, business judgement, and planning skills who is new to Python libraries and data engineering. This preference is recorded in the consolidated [project rules and priorities](../../AGENTS.md).
+
+- Split seven large code cells into 19 focused cells, each with a short explanation of its purpose. Introduced DataFrame, Series, Boolean masks, groupby, and dictionary updates using SQL comparisons.
+- Replaced the compact path search, nested conditional expressions, comprehensions, and dense checks with explicit variables, basic loops, and intermediate steps. Reuse the dictionary's existing descriptions and caveats instead of rebuilding metadata definitions during each audit.
+- Preserved every audit area, eligibility rule, privacy constraint, and business interpretation. Phase 1 remains complete; Phase 2 preparation is still planned.
+- A temporary regression script executed the committed original notebook and the simplified notebook, then compared identifier, missingness, category, numeric, service, outcome, eligibility, and dictionary results. All matched. A second fresh execution of the simplified notebook passed; independent CSV counts agreed. Raw CSV and dictionary bytes were unchanged, and saved outputs contain no customer IDs. The temporary script was deleted after verification.
+
+**Further simplification:** Removed automatic dictionary regeneration and custom category-frequency table building. The dictionary is now read-only documentation; category counts are displayed directly with value_counts(). Missingness summaries use standard pandas column operations, category spelling checks start from distinct values, and the blank-total investigation displays only tenure groups containing blanks. Service failure counts use a direct column sum. These changes remove 41 code lines while retaining all audit checks and results.
+
+A temporary check compared this version with the preceding 19-cell version across all audit results and per-category counts, then executed it again from a fresh namespace. Both runs passed. Independent CSV checks confirmed the central counts; raw data and dictionary bytes stayed unchanged. The temporary script and its baseline snapshot were deleted after verification.
+
+**Guided cell layout:** Split the 19-cell notebook into 43 code cells, with a maximum of 15 lines per cell. Every new cell has a Markdown explanation of its purpose and the intermediate Python/pandas operations it uses. Separated schema preparation/comparison/display, ID completeness/duplicates/conflicts, missingness summaries, numeric validity/ranges, service setup/dependencies/results, and eligibility/counts/rate/reconciliation. Kept loops and conditionals intact; numeric validity and range checks use separate focused loops. Later-phase plans and all audit rules remain intact.
+
+A temporary regression check compared all audit tables, masks, category counts, and baseline measures before and after the split. Results matched exactly. Two fresh runs of the 43-cell notebook passed; independent CSV counts, unique cell IDs, aggregate-only outputs, the raw checksum, and unchanged dictionary bytes were verified. Saved outputs reflect the new cell order. The temporary script and baseline snapshot were deleted.
 
 ## Phase 2: Cleaning decisions
 

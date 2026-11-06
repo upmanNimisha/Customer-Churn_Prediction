@@ -11,7 +11,9 @@
 - Evidence: [executed notebook](../../notebooks/churnprediction.ipynb), Phase 1 Steps 2.1-2.7; [audit log](analysis_log.md); [data dictionary](data_dictionary.csv); [analysis brief](analysis_brief.md).
 - Environment: Python 3.14.6, pandas 3.1.1, NumPy 2.5.4. UTF-8 comma-delimited input; inferred and literal string views distinguish pandas nulls from blank text. The notebook records the exact execution time and loading settings.
 - Reproduction: open the notebook in VS Code, select the project `.venv` kernel, restart it, run all cells in order, inspect outputs, and save. All manipulation and future preparation remain in notebook cells.
-- Step 3 verification: a temporary Python script executed the seven existing code cells twice in fresh IPython namespaces, checked independent CSV totals and local report links, and refreshed the saved aggregate outputs without changing analytical source. Dictionary bytes and raw checksum were unchanged on both runs. The script was deleted after checks; no permanent runner is required.
+- Original Step 3 verification: a temporary Python script executed the seven original code cells twice in fresh IPython namespaces, checked independent CSV totals and local report links, and refreshed the saved aggregate outputs without changing analytical source. Dictionary bytes and raw checksum were unchanged on both runs. The script was deleted after checks; no permanent runner is required.
+- Readability review: the same audit is now presented in 43 beginner-friendly code cells, each at most 15 lines, with a Markdown explanation for every step and its intermediate operations. This expands the earlier 19-cell layout while preserving all audit results. Temporary regression checks compared all audit tables and baseline measures, then reran the revised notebook in a fresh namespace. Results matched, raw data and dictionary bytes were unchanged, and no customer IDs appeared in saved outputs. Temporary check files were deleted. See the analysis log for the review record.
+- Further simplification removed automatic dictionary generation and custom frequency-table formatting. The audit now reads the reviewed dictionary without changing it, shows category counts directly, and focuses the blank-total display on affected tenure groups. Regression checks confirmed equivalent audit evidence and unchanged source/dictionary bytes across two fresh executions; temporary check files were deleted.
 
 ## Data suitability and audit summary
 
@@ -26,7 +28,7 @@
 | Review flags | No values outside the 1.5-IQR fences; no finite TotalCharges below MonthlyCharges | These diagnostic checks do not prove business validity |
 | Category/service checks | No category normalisation collisions, unexpected service states, or phone/internet dependency mismatches | Retain legitimate no-service states; source-allowed vocabulary remains unverified |
 | Field coverage | Dictionary covers all 21 fields with observed types, values/ranges, missingness, roles, and source-semantic caveats | Raw observed metadata is complete; source definitions remain open |
-| Preservation/repeatability | Notebook assertions check both raw views and source checksum; repeated execution reproduced the dictionary byte-for-byte | No raw-data modification or prepared customer table was needed to finish Phase 1 |
+| Preservation/repeatability | Notebook assertions check both raw views and source checksum; the reviewed dictionary remains byte-for-byte unchanged during current audit runs | No raw-data modification, dictionary regeneration, or prepared customer table is needed to rerun Phase 1 |
 
 The 11 blank totals occur on all 11 zero-tenure records and nowhere else. This is an association, not proof that their accumulated charge should be zero. Financial summaries involving TotalCharges have 7,032/7,043 observed-value coverage (99.84%). MonthlyCharges is complete for all 7,043 records, including the 1,869 labelled churners.
 
