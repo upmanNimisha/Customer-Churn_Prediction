@@ -1,13 +1,27 @@
 # Analysis working log
 
-Status: starter template. Replace placeholders with reviewed evidence as each phase is completed.
+Status: Phase 1, Step 1 business framing completed on 6 November 2026. Data audit and later-phase sections remain pending; replace their placeholders with reviewed evidence as work progresses.
 
 ## Phase 1: Business brief and quality audit
 
-- Stakeholder: retention and customer experience teams.
-- Decision: which segments to investigate and which retention actions to test.
-- Source, licence, collection period, and churn window: to verify.
-- Customer grain, identifier uniqueness, and valid label rules: to validate.
+### Step 1: Business framing and dataset context
+
+Completed on 6 November 2026 (Asia/Calcutta). See the [analysis brief](analysis_brief.md) for the question-to-evidence matrix, metric definitions, context register, and open questions OQ1-OQ8.
+
+- Stakeholders: retention managers, customer experience teams, and business stakeholders.
+- Decision: which segments to investigate first, which retention actions to test, and how to measure the results.
+- Evidence reviewed: project README, dataset README, provisional dictionary, notebook code, and raw CSV header. No audit results or business findings are asserted from code inspection.
+- Confirmed structure: the input has `customerID`, `Churn`, and the fields required for the planned descriptive questions. The header has no observation dates, cancellation dates, or campaign outcomes.
+- Intended grain: one customer per row. The meaning and uniqueness of `customerID` remain provisional pending source clarification and Step 2 checks (OQ4).
+- Expected labels: `Yes` and `No`, matching current notebook logic. Observed label validity and the operational churn definition/window remain unverified (OQ3, OQ6).
+- Provenance: original URL/reference, provider, acquisition date, licence, collection context, and field units are not verified by the reviewed repository documentation (OQ1, OQ2, OQ5). Obtain original source records; a familiar schema does not establish provenance.
+- Proposed metric policy: count unique eligible customers with resolved records and valid labels. Report missing/unexpected outcomes separately; do not map them to retained customers. Missing predictor or charge values alone do not change overall churn eligibility. Charge proxies must disclose valid-value coverage.
+- Interpretation: recorded snapshot prevalence, associations, and proposed tests only. No monthly trends, acquisition cohorts, causal effects, verified lost revenue, or future-window predictions are established. Sensitive characteristics alone will not justify targeting.
+- Next: run the Step 2 audit, validate eligibility and field meanings, and document segment-size reporting rules. Later outreach and pilot assumptions require operational input (OQ7, OQ8).
+
+Step 1 completion checks are met through documented evidence and explicit unresolved notes. Overall Phase 1 remains in progress until the audit and quality report are complete.
+
+### Step 2: Audit evidence (pending)
 
 | Check | Observed result | Affected rows | Follow-up or limitation |
 |---|---|---|---|

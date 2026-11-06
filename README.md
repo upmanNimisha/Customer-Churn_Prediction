@@ -107,7 +107,7 @@ Each phase has a question to answer, a defined output, and a completion criterio
 - Check whether tenure and charges contain implausible values, and investigate records that fail validation before deciding how to handle them.
 - Confirm metric definitions and document which questions cannot be answered with the available fields.
 
-**Deliverables:** Analysis brief, data dictionary, and data quality report in `outputs/reports/`. The provisional dictionary and analysis log are starter files to complete during this phase.
+**Deliverables:** Analysis brief, data dictionary, and data quality report in `outputs/reports/`. [Step 1 business framing](outputs/reports/analysis_brief.md) is documented, including metric rules, scope limits, and unresolved source questions. The data dictionary remains provisional; the full audit and quality report are pending. Progress and decisions are recorded in the [analysis log](outputs/reports/analysis_log.md).
 
 **Completion criterion:** The data grain, outcome definition, quality issues, and scope limitations are documented, with an explicit treatment or unresolved note for each issue.
 

@@ -16,3 +16,6 @@ outputs/data/*
 # Generated model files
 outputs/models/*
 !outputs/models/.gitkeep
+
+# Local Phase 1 planning document
+/phase 1 plan.md
