@@ -1,6 +1,6 @@
 # Analysis working log
 
-Status: Phase 1, Step 1 business framing completed on 6 November 2026. Data audit and later-phase sections remain pending; replace their placeholders with reviewed evidence as work progresses.
+Status: Phase 1 Steps 1 and 2 completed on 6 November 2026. The Step 3 quality report, treatment review, and later phases remain pending.
 
 ## Phase 1: Business brief and quality audit
 
@@ -21,11 +21,46 @@ Completed on 6 November 2026 (Asia/Calcutta). See the [analysis brief](analysis_
 
 Step 1 completion checks are met through documented evidence and explicit unresolved notes. Overall Phase 1 remains in progress until the audit and quality report are complete.
 
-### Step 2: Audit evidence (pending)
+### Step 2: Audit evidence
+
+Executed on 6 November 2026 (Asia/Calcutta) using Python 3.14.6, pandas 3.1.1, and NumPy 2.5.4. See the executed [notebook](../../notebooks/churnprediction.ipynb) for all seven code cells, field-level completeness, category frequencies, numeric checks, and preservation assertions. The [data dictionary](data_dictionary.csv) now covers all 21 fields with observed types, values/ranges, missingness, roles, units/coding notes, and verification status. Source semantics remain explicitly unverified.
+
+**Input:** `datasets/TelecomChurnData.csv`
+
+**SHA-256:** `88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a`
+
+Loading uses UTF-8, comma delimiter, and the first row as header. The inferred view uses pandas defaults. The literal string view disables NA parsing (`dtype="str", keep_default_na=False, na_filter=False`) to preserve empty strings, whitespace, and NA-like tokens. Neither view is cleaned. Counts below use 7,043 raw rows unless otherwise stated; flag populations can overlap.
 
 | Check | Observed result | Affected rows | Follow-up or limitation |
 |---|---|---|---|
-| To complete after profiling | Pending | Pending | Pending |
+| Shape and schema | 7,043 rows, 21 fields; no missing/unexpected fields or duplicate header names against the dictionary | 0 schema deviations | Expected schema is repository-defined, not a verified source contract |
+| Identifier completeness | 7,043 distinct nonblank IDs; no inferred null, empty, whitespace-only, or outer-whitespace IDs | 0 flagged | Observed identifier integrity passes; person/account/subscription meaning remains open |
+| Duplicate records | No excess copies or participating duplicate rows | 0 | Literal full-row comparison |
+| Repeated/conflicting identifiers | No repeated ID groups or rows; no conflicting ID groups or rows | 0 | No duplicate resolution required for this file |
+| Normalised identifier collisions | No distinct IDs collapse after strip/casefold | 0 collisions | Diagnostic only; identifiers not modified |
+| Inferred nulls and empty strings | Zero inferred nulls, literal empty strings, and nonblank NA-like tokens parsed as null in every field | 0 per field | This does not include whitespace-only strings |
+| Whitespace-only values | `TotalCharges` contains 11 whitespace-only values; no other field contains blanks or outer whitespace | 11 (0.1562%) | Preserve as unknown pending Step 3 treatment review; default null checks alone miss these values |
+| Category consistency | All observed categorical values and frequencies are in the notebook/dictionary; zero outer-whitespace rows and strip/casefold collision groups | 0 per categorical field | Observed vocabulary is not proof of source-allowed vocabulary |
+| SeniorCitizen coding | `0`: 5,901 rows; `1`: 1,142 rows; no unexpected codes | 0 unexpected | Source definition of the flag remains unverified |
+| Numeric conversion | `tenure` and `MonthlyCharges` parse throughout; `TotalCharges` has 7,032 finite values and 11 blanks; no nonblank parse failures or non-finite tokens | 11 blank totals; 0 malformed values | Numeric conversion is diagnostic; raw `TotalCharges` remains text |
+| Numeric ranges | Tenure: 0-72; MonthlyCharges: 18.25-118.75; TotalCharges: 18.8-8,684.8 among finite values | 0 negative values; 0 fractional tenure values | Units/currency and source-supported upper bounds remain unverified; fractional charges are legitimate |
+| Distributional review | No finite numeric values outside the documented 1.5-IQR fences in any of the three numeric fields | 0 per field | Distributional flags are not domain validity guarantees |
+| Blank totals by tenure | All 11 zero-tenure rows have blank TotalCharges; no blank totals at other tenure values | 11 | Relationship observed; cause and whether zero would be correct remain unknown |
+| Charge relationship review | No finite TotalCharges below MonthlyCharges | 0 | Comparison is a review flag, not a verified billing rule |
+| Service vocabulary and dependencies | No unexpected service values or phone/internet dependency mismatches in any documented check | 0 | Preserve legitimate no-service states; rules remain subject to source definitions |
+| Structural no-service states | `No phone service`: 682 MultipleLines rows; `No internet service`: 1,526 rows in each of six internet-dependent service fields | Valid states; not missing | These six populations overlap and must not be summed |
+| Outcome labels | `Yes`: 1,869; `No`: 5,174; no missing, blank, or unexpected labels | 0 invalid labels | Operational churn definition/window remains unknown |
+| Provisional eligibility | 7,043 eligible unique customers; 0 excluded by the audit's ID/label rule | 0 exclusions | Require nonblank ID without outer whitespace, no repeated ID, and exact Yes/No label |
+| Provisional churn prevalence | 1,869 / 7,043 = 26.536987%, displayed as 26.54%; retained: 5,174 | All 7,043 eligible customers | Recorded-label prevalence only; not monthly churn or a future-period forecast |
+| Source preservation | SHA-256 unchanged before/after execution; both in-memory raw views equal their snapshots | 0 source changes | No imputation, capping, cleaning, or customer-level export performed |
+
+**Reproduction:** Open `notebooks/churnprediction.ipynb` in VS Code, select the project's `.venv` kernel, restart the kernel, and run all cells from top to bottom. Review results and save the notebook to retain its outputs. The final audit cell refreshes the aggregate data dictionary and checks source preservation. During Step 2 verification, a second execution reproduced the dictionary byte-for-byte and preserved the raw checksum.
+
+**Workflow preference (6 November 2026):** The user prioritises a notebook-first data science workflow, with data manipulation and analysis implemented directly in `.ipynb` cells and minimal separate Python scripts. The optional external runner was removed; future work should use the interactive notebook workflow above. Existing audit code and evidence remain in the notebook. See [project priorities](../../AGENTS.md).
+
+**Step 2 completion:** All 21 fields are covered and every planned audit area has recorded evidence, including zero-issue checks. Observed grain and label coding support a provisional baseline. Source provenance, licence, business grain, field units, and churn definition/window remain open; no unsupported source claims were added.
+
+**Step 3 handoff:** Review treatment of the 11 blank totals without assuming zero; consolidate the quality report and issue register; finalise metric eligibility, reporting thresholds, and Phase 2 reconciliation rules. Overall Phase 1 remains in progress.
 
 ## Phase 2: Cleaning decisions
 

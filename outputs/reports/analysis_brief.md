@@ -2,7 +2,7 @@
 
 **Review date:** 6 November 2026 (Asia/Calcutta)
 
-**Status:** Phase 1, Step 1 complete: business framing documented and context uncertainties recorded. Data suitability and final metric eligibility remain subject to the Step 2 audit and Step 3 review. No validated business findings are published in this brief.
+**Status:** Phase 1 Steps 1 and 2 complete. Business framing and context uncertainties are documented here; the [analysis log](analysis_log.md) records the executed audit. Observed identifiers are unique and labels are Yes/No for all 7,043 records. Final treatment review and data suitability conclusions remain Step 3 work; source semantics remain unverified. No validated retention findings are published in this brief.
 
 ## Business decision and audience
 
@@ -109,4 +109,4 @@ Roles below are suggested follow-up owners, not confirmed assignments.
 - Every README business question maps to required fields and planned evidence.
 - Source, usage conditions, grain, label meaning, and units have evidence notes or explicit unresolved entries with follow-up actions.
 - Metric definitions include eligibility, missing outcomes, missing charges, overlap, and zero-denominator handling.
-- Scope limits and open questions are documented. Proceed to the Step 2 audit; Phase 1 as a whole remains in progress.
+- Scope limits and open questions are documented. Step 2 audit evidence is now available in the analysis log; the context register above records the source uncertainties established during Step 1. Phase 1 as a whole remains in progress pending Step 3.

@@ -2,7 +2,7 @@
 
 A data analyst project that uses telecom customer data to understand churn patterns, identify priority customer segments, and translate findings into practical retention recommendations. A baseline prediction model will support the analysis by testing whether customer characteristics can help prioritise outreach.
 
-> **Project status: Structure initialised; Phase 1 in progress.** The notebook includes portable data loading, initial quality checks, and churn label profiling. Starter folders, a provisional data dictionary, and an analysis log are in place. The remaining phases describe planned work; findings and deliverables will be added only after they are validated.
+> **Project status: Phase 1 in progress; Steps 1 and 2 complete.** Business framing and the reproducible raw-data audit are documented. The executed notebook, observed data dictionary, and analysis log record 7,043 rows, unique identifiers, and 11 whitespace-only `TotalCharges` values. Source definitions remain unverified; the Step 3 quality report and treatment review are pending. Later phases remain planned.
 
 ## Business objective
 
@@ -107,7 +107,7 @@ Each phase has a question to answer, a defined output, and a completion criterio
 - Check whether tenure and charges contain implausible values, and investigate records that fail validation before deciding how to handle them.
 - Confirm metric definitions and document which questions cannot be answered with the available fields.
 
-**Deliverables:** Analysis brief, data dictionary, and data quality report in `outputs/reports/`. [Step 1 business framing](outputs/reports/analysis_brief.md) is documented, including metric rules, scope limits, and unresolved source questions. The data dictionary remains provisional; the full audit and quality report are pending. Progress and decisions are recorded in the [analysis log](outputs/reports/analysis_log.md).
+**Deliverables:** Analysis brief, data dictionary, and data quality report in `outputs/reports/`. [Step 1 business framing](outputs/reports/analysis_brief.md) and the Step 2 audit are documented. The [data dictionary](outputs/reports/data_dictionary.csv) includes observed types, values/ranges, missingness, and roles for all 21 fields; source meanings and units remain provisional. The Step 3 quality report and treatment review are pending. Evidence and open questions are recorded in the [analysis log](outputs/reports/analysis_log.md).
 
 **Completion criterion:** The data grain, outcome definition, quality issues, and scope limitations are documented, with an explicit treatment or unresolved note for each issue.
 
@@ -260,7 +260,7 @@ CustomerChurnPrediction/
 |-- datasets/
 |   `-- TelecomChurnData.csv       # Raw input; preserve unchanged
 |-- notebooks/
-|   `-- churnprediction.ipynb      # Initial audit and six phase sections
+|   `-- churnprediction.ipynb      # Executed raw-data audit and six phase sections
 |-- sql/
 |   `-- README.md                 # Query plan; engine and queries pending
 |-- dashboard/
@@ -271,12 +271,18 @@ CustomerChurnPrediction/
 |   |-- charts/                   # Reviewed chart exports
 |   |-- models/                   # Generated model artifacts; ignored by Git
 |   `-- reports/
-|       |-- data_dictionary.csv    # Provisional field descriptions
+|       |-- data_dictionary.csv    # Observed profiles; source semantics unverified
 |       `-- analysis_log.md        # Audit, cleaning, findings, and action templates
 |-- requirements.txt              # Current pinned Python dependencies
 |-- .gitignore
 `-- README.md                     # Project scope, roadmap, and eventual findings
 ```
+
+## Workflow priorities
+
+Use a notebook-first data science workflow. Keep data loading, auditing, manipulation, cleaning, feature preparation, visualisation, and modelling directly in `notebooks/churnprediction.ipynb`, with Markdown explanations and visible aggregate results. Run cells interactively in VS Code using the project kernel, and keep the notebook reproducible from a fresh kernel by running cells from top to bottom.
+
+Keep separate Python scripts to a minimum and use helpers only for a concrete need that cannot be handled clearly in the notebook. Notebook generation scripts and external notebook execution/rewrite scripts are not part of this workflow. Project contributor instructions are recorded in [AGENTS.md](AGENTS.md).
 
 ## Current setup and execution
 
@@ -288,7 +294,7 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Open `notebooks/churnprediction.ipynb` in VS Code, select the `.venv` kernel, and run the cells in order. Launch from the repository root or a directory inside it; the notebook locates the raw CSV using project-relative paths. Current executable cells perform initial profiling only and do not modify the source file or generate cleaned data.
+Open `notebooks/churnprediction.ipynb` in VS Code, select the `.venv` kernel, and run the cells in order. Launch from the repository root or a directory inside it; the notebook locates the raw CSV using project-relative paths. Current executable cells audit the raw data, verify its checksum, and refresh the aggregate data dictionary; they do not modify the source file or generate cleaned data. Use **Restart Kernel**, then **Run All**, to check that the notebook works without state left over from earlier interactive runs. Save the notebook to retain the reviewed outputs. No separate Python runner is required.
 
 Use `outputs/reports/analysis_log.md` to record decisions and findings as work progresses. Each notebook phase has a Markdown planning section, so future work can be added without placeholder executable code.
 
