@@ -2,7 +2,7 @@
 
 A data analyst project that uses telecom customer data to understand churn patterns, identify priority customer segments, and translate findings into practical retention recommendations. A baseline prediction model will support the analysis by testing whether customer characteristics can help prioritise outreach.
 
-> **Project status: Phase 1 in progress; Steps 1 and 2 complete.** Business framing and the reproducible raw-data audit are documented. The executed notebook, observed data dictionary, and analysis log record 7,043 rows, unique identifiers, and 11 whitespace-only `TotalCharges` values. Source definitions remain unverified; the Step 3 quality report and treatment review are pending. Later phases remain planned.
+> **Project status: Phase 1 complete; ready for Phase 2 preparation.** The analysis brief, executed audit, observed data dictionary, and quality report document 7,043 unique identifiers, 1,869 Yes labels, and 11 whitespace-only `TotalCharges` values. Preparation rules preserve all records and keep unknown totals missing. Source provenance, usage conditions, business definitions, and units remain explicitly unresolved. Phase 2 implementation and later phases remain planned.
 
 ## Business objective
 
@@ -36,7 +36,7 @@ Demographic fields may be used to describe the customer population and check whe
 
 **Input:** `datasets/TelecomChurnData.csv`
 
-The file contains customer identifiers, customer characteristics, subscription details, billing information, and a `Churn` label. Phase 1 will confirm that one row represents one unique customer and document the source and label definition.
+The file contains customer identifiers, customer characteristics, subscription details, billing information, and a `Churn` label. Phase 1 verified one row per observed `customerID` and exact Yes/No coding. Whether each ID represents a person, account, or subscription, as well as the original source and operational churn definition, remains unverified and is documented in the quality report.
 
 | Field group | Examples | Analytical purpose |
 |---|---|---|
@@ -63,7 +63,7 @@ All metrics will use the validated customer-level dataset. Exclusions and missin
 | Gap from overall rate | Segment churn rate minus overall churn rate | Difference expressed in percentage points |
 | Monthly charge exposure proxy | Sum of `MonthlyCharges` for customers labelled as churned | Descriptive billing amount associated with churners; not verified lost revenue |
 
-Every segment rate will be shown with its customer count and churn count. Small groups will be flagged using a documented minimum size, and uncertainty intervals will be considered for key comparisons. Missing charge values will be reported alongside financial proxies.
+Every segment rate will be shown with its customer count and churn count. Groups with fewer than 30 eligible customers will be flagged as small under an analyst-selected reporting convention; this is not a precision guarantee. Phase 3 will include 95% Wilson intervals for key rates and check sensitivity where the convention affects priorities. Missing charge values will be reported alongside financial proxies. See the [quality report](outputs/reports/data_quality_report.md) for the complete denominator and reporting rules.
 
 ## Professional analytics pipeline
 
@@ -88,7 +88,7 @@ Each phase has a question to answer, a defined output, and a completion criterio
 
 | Phase | Focus | Primary deliverables | Status |
 |---|---|---|---|
-| 1 | Business framing and data audit | Analysis brief, data dictionary, quality report | In progress |
+| 1 | Business framing and data audit | Analysis brief, data dictionary, quality report | Complete; unresolved source limitations documented |
 | 2 | Data cleaning and analytical preparation | Prepared dataset, cleaning log, reproducible preparation steps | Planned |
 | 3 | Exploratory analysis and SQL validation | Question-led analysis, charts, reusable SQL queries | Planned |
 | 4 | Business interpretation and retention planning | Prioritised segments, recommendation matrix, experiment proposals | Planned |
@@ -107,7 +107,7 @@ Each phase has a question to answer, a defined output, and a completion criterio
 - Check whether tenure and charges contain implausible values, and investigate records that fail validation before deciding how to handle them.
 - Confirm metric definitions and document which questions cannot be answered with the available fields.
 
-**Deliverables:** Analysis brief, data dictionary, and data quality report in `outputs/reports/`. [Step 1 business framing](outputs/reports/analysis_brief.md) and the Step 2 audit are documented. The [data dictionary](outputs/reports/data_dictionary.csv) includes observed types, values/ranges, missingness, and roles for all 21 fields; source meanings and units remain provisional. The Step 3 quality report and treatment review are pending. Evidence and open questions are recorded in the [analysis log](outputs/reports/analysis_log.md).
+**Completed deliverables:** [Analysis brief](outputs/reports/analysis_brief.md), [data dictionary](outputs/reports/data_dictionary.csv), and [quality report](outputs/reports/data_quality_report.md). The quality report contains issues DQ01-DQ07, preparation treatments, metric rules, and Phase 2 acceptance checks. Evidence and open questions are recorded in the [analysis log](outputs/reports/analysis_log.md). Source meanings and units remain provisional; their unresolved status does not imply a failed or incomplete audit.
 
 **Completion criterion:** The data grain, outcome definition, quality issues, and scope limitations are documented, with an explicit treatment or unresolved note for each issue.
 
@@ -253,7 +253,7 @@ Plan the Power BI report around three pages:
 
 ## Repository structure
 
-The structure below is initialised. Empty output folders reserve locations for future artifacts; report templates and provisional field descriptions do not represent completed analysis.
+The structure below includes completed Phase 1 artifacts. Empty output folders reserve locations for later phases; unverified source semantics and later-phase log templates do not represent validated business findings.
 
 ```text
 CustomerChurnPrediction/
@@ -271,7 +271,9 @@ CustomerChurnPrediction/
 |   |-- charts/                   # Reviewed chart exports
 |   |-- models/                   # Generated model artifacts; ignored by Git
 |   `-- reports/
+|       |-- analysis_brief.md      # Business scope, questions, and metrics
 |       |-- data_dictionary.csv    # Observed profiles; source semantics unverified
+|       |-- data_quality_report.md # Issues, preparation rules, and Phase 2 handoff
 |       `-- analysis_log.md        # Audit, cleaning, findings, and action templates
 |-- requirements.txt              # Current pinned Python dependencies
 |-- .gitignore
@@ -282,7 +284,7 @@ CustomerChurnPrediction/
 
 Use a notebook-first data science workflow. Keep data loading, auditing, manipulation, cleaning, feature preparation, visualisation, and modelling directly in `notebooks/churnprediction.ipynb`, with Markdown explanations and visible aggregate results. Run cells interactively in VS Code using the project kernel, and keep the notebook reproducible from a fresh kernel by running cells from top to bottom.
 
-Keep separate Python scripts to a minimum and use helpers only for a concrete need that cannot be handled clearly in the notebook. Notebook generation scripts and external notebook execution/rewrite scripts are not part of this workflow. Project contributor instructions are recorded in [AGENTS.md](AGENTS.md).
+Keep separate Python scripts to a minimum and use helpers only for a concrete need that cannot be handled clearly in the notebook. Permanent notebook generation or execution/rewrite scripts are not part of this workflow. For agent verification, temporary Python scripts may execute the existing notebook cells and check outputs; delete these scripts when verification is complete instead of controlling the user's computer. Project contributor instructions are recorded in [AGENTS.md](AGENTS.md).
 
 ## Current setup and execution
 

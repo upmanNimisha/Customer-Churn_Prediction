@@ -1,6 +1,6 @@
 # Analysis working log
 
-Status: Phase 1 Steps 1 and 2 completed on 6 November 2026. The Step 3 quality report, treatment review, and later phases remain pending.
+Status: All three Phase 1 steps completed on 6 November 2026. Ready for Phase 2 snapshot preparation with documented source limitations; Phase 2 implementation and later phases remain planned.
 
 ## Phase 1: Business brief and quality audit
 
@@ -19,7 +19,7 @@ Completed on 6 November 2026 (Asia/Calcutta). See the [analysis brief](analysis_
 - Interpretation: recorded snapshot prevalence, associations, and proposed tests only. No monthly trends, acquisition cohorts, causal effects, verified lost revenue, or future-window predictions are established. Sensitive characteristics alone will not justify targeting.
 - Next: run the Step 2 audit, validate eligibility and field meanings, and document segment-size reporting rules. Later outreach and pilot assumptions require operational input (OQ7, OQ8).
 
-Step 1 completion checks are met through documented evidence and explicit unresolved notes. Overall Phase 1 remains in progress until the audit and quality report are complete.
+Step 1 completion checks were met through documented evidence and explicit unresolved notes. Subsequent Steps 2 and 3 below record the audit and final review.
 
 ### Step 2: Audit evidence
 
@@ -56,13 +56,29 @@ Loading uses UTF-8, comma delimiter, and the first row as header. The inferred v
 
 **Reproduction:** Open `notebooks/churnprediction.ipynb` in VS Code, select the project's `.venv` kernel, restart the kernel, and run all cells from top to bottom. Review results and save the notebook to retain its outputs. The final audit cell refreshes the aggregate data dictionary and checks source preservation. During Step 2 verification, a second execution reproduced the dictionary byte-for-byte and preserved the raw checksum.
 
-**Workflow preference (6 November 2026):** The user prioritises a notebook-first data science workflow, with data manipulation and analysis implemented directly in `.ipynb` cells and minimal separate Python scripts. The optional external runner was removed; future work should use the interactive notebook workflow above. Existing audit code and evidence remain in the notebook. See [project priorities](../../AGENTS.md).
+**Workflow preference (6 November 2026):** The user prioritises a notebook-first data science workflow, with data manipulation and analysis implemented directly in `.ipynb` cells and minimal separate Python scripts. The optional permanent external runner was removed. Users can run the notebook interactively; agent verification uses temporary Python scripts that are deleted after checking outputs, without computer control. Existing audit code and evidence remain in the notebook. See [project priorities](../../AGENTS.md).
 
 **Step 2 completion:** All 21 fields are covered and every planned audit area has recorded evidence, including zero-issue checks. Observed grain and label coding support a provisional baseline. Source provenance, licence, business grain, field units, and churn definition/window remain open; no unsupported source claims were added.
 
-**Step 3 handoff:** Review treatment of the 11 blank totals without assuming zero; consolidate the quality report and issue register; finalise metric eligibility, reporting thresholds, and Phase 2 reconciliation rules. Overall Phase 1 remains in progress.
+### Step 3: Quality review and Phase 2 readiness
+
+Completed on 6 November 2026. The [quality report](data_quality_report.md) consolidates issues DQ01-DQ07, their evidence and overlap, proposed preparation rules, metric definitions, validation checks, and the readiness decision. Reviewed the analysis brief and dictionary against the audit and brought their interpretation notes into agreement.
+
+- **Treatments:** Retain all 7,043 records and original identifiers. In Phase 2, convert TotalCharges in a prepared copy and keep the 11 whitespace-only values missing, with a missing-total flag. Do not infer zero from the zero-tenure association. Retain legitimate no-service categories. No cleaning or row exclusions were performed during Phase 1.
+- **Metric eligibility:** All 7,043 observed IDs have valid labels; counts are 1,869 Yes and 5,174 No, giving recorded-label prevalence of 26.54%. Charge completeness does not affect churn denominators. Missing segment values must be shown explicitly and charge summaries must disclose valid-value coverage.
+- **Reporting choice:** Flag segment N < 30 as an analyst-selected convention, not a guarantee of precision. Phase 3 will report 95% Wilson intervals for key rates and assess sensitivity where the convention affects priorities. Rates and percentage-point gaps use two display decimals.
+- **Verification:** A temporary Python script executed all seven existing notebook code cells twice in fresh IPython namespaces. Both executions passed the notebook assertions and aggregate checks; the data dictionary was identical byte-for-byte, and raw SHA-256 stayed unchanged. Independent standard-library CSV checks reconciled IDs, labels, and the 11 blank totals. Saved aggregate outputs contain no individual IDs. The temporary script was deleted after verification.
+- **Workflow clarification:** Verification uses temporary scripts instead of computer control; permanent analytical logic stays in the notebook. An older open notebook buffer was preserved separately in the ignored `.ipynb_checkpoints/churnprediction-before-step3.ipynb` before verification continued. No computer control was used for the final checks.
+- **Open limitations:** Source URL/provider/version, licence/acquisition details, population/collection context, business grain, churn event/window, and units remain unverified. The absence of dates and intervention outcomes limits trends, future-window prediction, and causal claims. Each limitation has a follow-up action in the brief/quality report.
+- **Readiness:** Ready for deterministic Phase 2 preparation of this supplied snapshot. No observed quality issue blocks those preparation rules. This decision does not establish source usage terms or operational readiness.
+
+**Phase 2 acceptance checks:** Preserve raw SHA-256 and the exact set of 7,043 IDs; retain 1,869 Yes/ones and 5,174 No/zeros; expect zero exclusions, zero missing MonthlyCharges, and 11 missing TotalCharges/missing-total flags. Preserve categories, service consistency, and finite numeric ranges. Reconcile bands and exported tables to the same customer and churn counts. Document actual transformations and export paths in the notebook and log.
+
+**Phase 1 completion:** Business scope, data grain, label coding versus unresolved outcome meaning, quality evidence, issue treatments, limitations, and Phase 2 acceptance criteria are documented. Phase 2 implementation has not started.
 
 ## Phase 2: Cleaning decisions
+
+Preparation rules have been specified in the Phase 1 quality report. Record actual implementation, changed-row counts, validation results, derived-field definitions, and exported filenames here when Phase 2 begins.
 
 | Field or issue | Evidence | Rule and rationale | Rows affected | Validation |
 |---|---|---|---|---|

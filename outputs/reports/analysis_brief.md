@@ -2,7 +2,7 @@
 
 **Review date:** 6 November 2026 (Asia/Calcutta)
 
-**Status:** Phase 1 Steps 1 and 2 complete. Business framing and context uncertainties are documented here; the [analysis log](analysis_log.md) records the executed audit. Observed identifiers are unique and labels are Yes/No for all 7,043 records. Final treatment review and data suitability conclusions remain Step 3 work; source semantics remain unverified. No validated retention findings are published in this brief.
+**Status:** Phase 1 complete. The [analysis log](analysis_log.md) records the executed audit, and the [quality report](data_quality_report.md) records treatment decisions and Phase 2 readiness. All 7,043 observed IDs are unique with Yes/No labels. Retain all records for snapshot preparation and preserve 11 unknown totals as missing. Source semantics remain unverified; no validated retention recommendations are published in this brief.
 
 ## Business decision and audience
 
@@ -36,30 +36,31 @@ Repository references reviewed on the date above:
 
 - [Project README](../../README.md): business objectives, scope, metrics, and phase criteria.
 - [Dataset README](../../datasets/README.md): raw input policy and explicitly unverified source context.
-- [Provisional dictionary](data_dictionary.csv): candidate field meanings and verification notes.
-- [Notebook](../../notebooks/churnprediction.ipynb): initial loading and audit logic, including expected `Yes` / `No` labels. Code inspection does not establish that its checks pass.
-- `datasets/TelecomChurnData.csv`: header inspected to confirm the presence of the named fields. Full profiling remains Step 2 work.
+- [Data dictionary](data_dictionary.csv): observed profiles for all 21 fields, with source meanings and units still provisional.
+- [Notebook](../../notebooks/churnprediction.ipynb): executed loading and audit logic, including observed `Yes` / `No` labels and aggregate quality evidence.
+- `datasets/TelecomChurnData.csv`: fully profiled in Step 2 and rechecked in Step 3; unchanged input checksum is recorded in the quality report.
+- [Quality report](data_quality_report.md): reviewed issues, preparation decisions, metric contract, and Phase 2 acceptance checks.
 
 | Context item | Current evidence or working assumption | Verification status and next action |
 |---|---|---|
-| Input | Local file `datasets/TelecomChurnData.csv`; preserve unchanged | File present; identify the audited version with a checksum in Step 2 |
+| Input | Local file `datasets/TelecomChurnData.csv`; preserved unchanged | Audited input SHA-256 is recorded in the quality report and notebook |
 | Source URL or reference | No original source citation is supplied in the reviewed repository documentation | Unresolved: obtain the original download reference or acquisition record from the dataset supplier; do not infer provenance from familiar column names |
 | Provider | No provider is identified in the reviewed documentation | Unresolved: verify against the original source and establish that it describes this exact file |
 | Source access date | Original download or access date is not recorded | Unresolved: obtain the acquisition record; the review date above is a local documentation review date |
 | Licence and usage conditions | Dataset README explicitly says the licence is unverified | Unresolved: locate applicable terms for the exact source/version and record attribution or redistribution conditions |
 | Collection period and observation context | No dates or collection methodology are documented | Unresolved: obtain source documentation describing population, sampling, observation timing, and whether data is real or synthetic |
-| Grain | Intended to be one customer per row; `customerID` is documented provisionally as the customer identifier | Assumption: Step 2 must check blanks, uniqueness, exact duplicates, and conflicting repeated identifiers; source documentation must clarify whether this identifies a person, account, or subscription |
-| Outcome field | `Churn` exists; current notebook expects `Yes` and `No` | Expected coding only: Step 2 must profile observed labels; original source must confirm the operational meaning |
+| Grain | 7,043 rows and 7,043 distinct nonblank IDs; no repeated IDs, conflicts, or exact duplicates | One row per observed ID verified; source documentation must clarify whether this identifies a person, account, or subscription |
+| Outcome field | `Churn` has 1,869 `Yes` and 5,174 `No` labels; no invalid/missing values | Observed coding verified; original source must confirm the operational meaning |
 | Churn definition and window | No cancellation rule, event timing, or observation window is verified | Unresolved: verify whether churn means cancellation, non-renewal, inactivity, or another event, and the period to which it applies |
 | Field units | `tenure`, `MonthlyCharges`, and `TotalCharges` exist; dictionary definitions remain provisional | Unresolved: verify tenure units, charge currency, billing basis, and accumulation timing before using unit-specific labels |
 | Dated and operational outcomes | CSV header has no observation date, cancellation date, campaign assignment, or campaign outcome fields | Confirmed header limitation: dated trends and intervention effects require additional data |
 
-## Working eligibility and metric definitions
+## Reviewed eligibility and metric definitions
 
-These are the proposed analytical rules to validate in Steps 2 and 3. They do not establish the number of eligible customers or authorise unreviewed cleaning.
+These rules were reviewed against the Step 2 audit and finalised for the supplied snapshot in Step 3. All 7,043 IDs are eligible under the ID/label rule, with 1,869 recorded churners and zero exclusions. Implementation of the documented preparation rules belongs to Phase 2; source business definitions remain unresolved.
 
-- An eligible customer must have a usable, nonblank identifier, a resolved customer-level record, and a valid outcome label. Count each eligible customer once. Investigate duplicate identifiers before choosing a resolution; never select an arbitrary record from a conflict.
-- Use expected labels `Yes` and `No` pending validation. Missing, blank, and unexpected labels are unresolved outcomes; do not silently map them to `No`. Exclude them from churn-rate denominators and report their counts and reasons separately. Any later label standardisation needs a documented rule.
+- An eligible customer must have a nonblank identifier without outer whitespace, a resolved customer-level record, and a valid outcome label. Count each eligible customer once. Hold repeated IDs for investigation before choosing a documented resolution; never select an arbitrary record from a conflict. No such conflicts occur in this file.
+- Use exact labels `Yes` and `No`, as observed in this file. Missing, blank, and unexpected labels are unresolved outcomes; do not silently map them to `No`. Exclude them from churn-rate denominators and report their counts and reasons separately. Any later label standardisation needs a documented rule.
 - Record raw rows, unique identifiers, duplicate/conflict populations, and customer exclusions separately. Overlapping issue populations must not be added as if mutually exclusive. Reconcile the final eligible population before publishing metrics.
 - Missing predictor fields do not by themselves exclude an otherwise eligible customer from overall churn metrics. Show missing segment values as an explicit group; if a comparison excludes that group, state the filter and denominator.
 - Missing or invalid charges do not remove a customer from churn-rate metrics. Charge summaries use valid observed amounts and disclose omitted customer counts and coverage; do not substitute zero for unknown values.
@@ -76,7 +77,7 @@ Let **N** be the number of unique eligible customers, **C** the number of those 
 | Gap from overall rate | 100 x ((C_s / N_s) - (C / N)) | Percentage points, not relative percentage change; undefined if either rate is undefined |
 | Monthly charge exposure proxy | Sum of valid `MonthlyCharges` for eligible customers labelled `Yes` | Descriptive billing exposure only; disclose valid/missing/invalid charge counts and coverage. If no valid amounts exist, report unavailable. Currency remains unverified |
 
-Counts should be exact. Calculate rates from unrounded counts and round only for display, consistently across Python, SQL, and Power BI. A minimum segment size must be chosen and documented before interpreting comparisons; its value remains open pending the audit. Show small-group flags and consider uncertainty intervals for key comparisons.
+Counts should be exact. Calculate rates from unrounded counts and round rates and percentage-point gaps to two decimal places for display, consistently across Python, SQL, and Power BI. Flag groups with fewer than 30 eligible customers under an analyst-selected reporting convention; this is not a precision guarantee. Phase 3 will show 95% Wilson intervals for key rates and assess sensitivity where the convention affects priorities. Missing totals do not reduce churn denominators; charge summaries must report their own valid-value coverage.
 
 ## Interpretation boundaries
 
@@ -97,10 +98,10 @@ Roles below are suggested follow-up owners, not confirmed assignments.
 | OQ1 | Where did this exact file come from, and under which terms? | Original URL, provider, version, acquisition date, and licence / dataset supplier | Attribution and permitted reuse remain unverified; do not claim a source or licence |
 | OQ2 | What population and collection period does the file represent? | Sampling, collection methodology, real/synthetic status, and dates / dataset supplier | Limit findings to the supplied dataset; do not generalise to a current customer base |
 | OQ3 | What does `Churn` mean, and over what period? | Operational event rule, coding, and observation window / source documentation or business data owner | Report recorded labels only; no monthly or future-period churn claims |
-| OQ4 | Does `customerID` identify a unique customer, account, or subscription? | Source definition plus uniqueness and conflict checks / source documentation and Step 2 analyst | Customer grain and eligible counts remain provisional |
+| OQ4 | Does `customerID` identify a customer, account, or subscription? | Source definition still needed; observed uniqueness and absence of conflicts verified / dataset supplier | Business grain remains unverified; counts are valid per observed ID |
 | OQ5 | What are the tenure and charge units and timing? | Field definitions, currency, billing basis, and accumulation rules / source documentation | Avoid unverified month/currency labels and realised-loss interpretations |
-| OQ6 | Which values and records require treatment? | Full audit of labels, IDs, nulls/blanks, numeric conversion, categories, and plausibility / Step 2 analyst | Final eligibility, exclusions, and preparation rules remain pending |
-| OQ7 | What group size and uncertainty reporting are appropriate? | Observed segment sizes and a documented reporting choice / analyst with stakeholder input | Do not prioritise groups from unstable rates alone |
+| OQ6 | Which values and records require treatment? | Audit completed; see DQ01-DQ03 and preparation rules in the quality report / analyst | Decision documented: no row exclusions; convert totals while keeping 11 blanks missing. Implement in Phase 2; blank-total cause remains open |
+| OQ7 | What group size and uncertainty reporting are appropriate? | Initial convention documented in Step 3: flag N < 30 and show 95% Wilson intervals for key rates / analyst with later stakeholder input | Reporting decision recorded; assess sensitivity in Phase 3 and avoid ranking unstable rates alone |
 | OQ8 | What outreach capacity and pilot measures are realistic? | Contact capacity, costs, eligibility, feasible actions, and follow-up outcomes / retention team | Later prioritisation, benefit scenarios, and model comparisons require explicit assumptions |
 
 ## Step 1 completion review
@@ -109,4 +110,4 @@ Roles below are suggested follow-up owners, not confirmed assignments.
 - Every README business question maps to required fields and planned evidence.
 - Source, usage conditions, grain, label meaning, and units have evidence notes or explicit unresolved entries with follow-up actions.
 - Metric definitions include eligibility, missing outcomes, missing charges, overlap, and zero-denominator handling.
-- Scope limits and open questions are documented. Step 2 audit evidence is now available in the analysis log; the context register above records the source uncertainties established during Step 1. Phase 1 as a whole remains in progress pending Step 3.
+- Scope limits and open questions are documented. The audit and Step 3 review now complete Phase 1; the quality report records readiness for deterministic snapshot preparation with unresolved source limitations carried forward.
