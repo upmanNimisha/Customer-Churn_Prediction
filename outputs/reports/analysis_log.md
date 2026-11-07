@@ -1,6 +1,6 @@
 # Analysis working log
 
-Status: All three Phase 1 steps completed on 6 November 2026. Ready for Phase 2 snapshot preparation with documented source limitations; Phase 2 implementation and later phases remain planned.
+Status: Phase 1 completed on 6 November 2026. Phase 2 Step 1 (prepared-copy cleaning) completed and verified on 7 November 2026. Phase 2 remains in progress; derived fields, bands, final export, and handoff remain planned. Documented source limitations still apply.
 
 ## Phase 1: Business brief and quality audit
 
@@ -95,13 +95,27 @@ A temporary regression check compared all audit tables, masks, category counts, 
 
 ## Phase 2: Cleaning decisions
 
-Preparation rules have been specified in the Phase 1 quality report. Record actual implementation, changed-row counts, validation results, derived-field definitions, and exported filenames here when Phase 2 begins.
+### Step 1: Prepared copy and documented cleaning rules
 
-| Field or issue | Evidence | Rule and rationale | Rows affected | Validation |
+Completed and verified on 7 November 2026 (Asia/Calcutta). Implementation is in `notebooks/churnprediction.ipynb`, Phase 2 Step 1: 14 focused code cells, each at most 15 lines, with Markdown explanations. `prepared_df` is a separate in-memory table with the original 21 fields in source order. No files or customer-level records are exported by these cells.
+
+| Field or issue | Evidence | Implemented rule and rationale | Rows affected | Validation |
 |---|---|---|---|---|
-| To complete after investigation | Pending | Pending | Pending | Pending |
+| Source identity and raw views | Phase 1 checksum and snapshots | Require the reviewed checksum before preparation; preserve raw views and dictionary bytes | 0 source changes | SHA-256 remains `88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a`; both raw views and dictionary bytes unchanged |
+| IDs, duplicates, and labels | Unique nonblank IDs without outer whitespace; exact Yes/No labels | Stop on invalid IDs, repeated IDs, or unexpected labels; no arbitrary deduplication or silent exclusions | 0 altered IDs; 0 exclusions | Exact ID values and order retained; 7,043 unique IDs; 1,869 Yes and 5,174 No |
+| Text categories | Zero outer-whitespace changes in audited categorical fields | Inspect trim counts before assignment; preserve spelling, case, and category meanings; stop if new whitespace needs review | 0 categorical value changes | Row-by-row equality with raw categories; SeniorCitizen retains original integer coding |
+| Tenure | 7,043 valid whole numeric values | Explicit conversion from literal text to whole integers; reject negative or fractional values | 7,043 values validated and assigned; 0 numerical changes | No missing values, parse failures, or non-finite values; range 0-72 retained |
+| MonthlyCharges | 7,043 valid numeric values | Explicit numeric conversion; preserve values without imputation or capping | 7,043 values validated and assigned; 0 numerical changes | 0 missing; range 18.25-118.75 retained |
+| TotalCharges (DQ01/DQ02) | 7,032 numeric strings and 11 whitespace-only totals | Convert numeric text; represent known blank totals as missing numeric values, without imputing zero | 7,032 text-to-number conversions and 11 blank-to-missing conversions; 0 changes to observed numerical values | Exactly 11 missing totals, matching the raw blank mask row by row; all at zero tenure; observed range 18.8-8,684.8 retained |
+| No-service states (DQ03) | 682 No phone service states; 1,526 No internet service states per dependent field | Retain legitimate states; repeat vocabulary and dependency checks on the prepared copy | 0 state changes | Zero service flags; state counts retained across all six internet-dependent fields |
 
-Record counts before and after preparation, exclusions, band boundaries, and output filenames. Preserve unknown values until a treatment is justified.
+Counts refer to different field-level operations and must not be summed as distinct affected customers. The 11 blank-total records overlap the 11 zero-tenure records; none is excluded. Numeric assignment is distinct from changing an observed numerical value.
+
+**Verification:** The project `.venv` ran successfully with execution access to its base interpreter; no environment repair or dependency change was needed. Python 3.14.6, pandas 3.1.1, and NumPy 2.5.4 were used. A temporary script executed all 57 notebook code cells twice in fresh IPython namespaces. Both runs passed, and the prepared tables matched exactly, including types and order. Independent standard-library CSV counts agreed with 7,043 IDs, 1,869 Yes labels, and 11 blank totals. Raw CSV and dictionary bytes remained unchanged. Saved aggregate outputs contain no customer identifiers. Additional checks introduced an unknown churn label, malformed TotalCharges text, and infinity into isolated copies; each was rejected by an assertion before numeric assignment. Temporary editing and verification scripts were removed after verification.
+
+**Step 1 result:** 7,043 rows and 21 columns; zero exclusions; 11 missing totals; all observed numeric values, identifier order, labels, categories, and service relationships preserved. These missing charges do not alter churn denominators. Provenance, usage conditions, business grain, churn window, and field units remain unresolved.
+
+**Next:** Step 2 adds the churn indicator, missing-total flag, analytical bands, and prepared-data dictionary. Step 3 performs final reconciliation, export/reload validation, and Phase 3 handoff. Phase 2 is not yet complete.
 
 ## Phase 3: Business answers and reconciliation
 

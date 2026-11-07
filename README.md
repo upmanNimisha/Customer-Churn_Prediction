@@ -2,7 +2,7 @@
 
 A data analyst project that uses telecom customer data to understand churn patterns, identify priority customer segments, and translate findings into practical retention recommendations. A baseline prediction model will support the analysis by testing whether customer characteristics can help prioritise outreach.
 
-> **Project status: Phase 1 complete; ready for Phase 2 preparation.** The analysis brief, executed audit, observed data dictionary, and quality report document 7,043 unique identifiers, 1,869 Yes labels, and 11 whitespace-only `TotalCharges` values. Preparation rules preserve all records and keep unknown totals missing. Source provenance, usage conditions, business definitions, and units remain explicitly unresolved. Phase 2 implementation and later phases remain planned.
+> **Project status: Phase 1 complete; Phase 2 Step 1 complete.** The notebook now creates and validates a separate prepared copy, retaining all 7,043 unique identifiers and 1,869 Yes labels while converting the 11 blank `TotalCharges` values to missing numeric values. No records are excluded or charge values imputed. Phase 2 derived fields, analytical bands, final export, and handoff remain planned. Source provenance, usage conditions, business definitions, and units remain explicitly unresolved.
 
 ## Business objective
 
@@ -89,7 +89,7 @@ Each phase has a question to answer, a defined output, and a completion criterio
 | Phase | Focus | Primary deliverables | Status |
 |---|---|---|---|
 | 1 | Business framing and data audit | Analysis brief, data dictionary, quality report | Complete; unresolved source limitations documented |
-| 2 | Data cleaning and analytical preparation | Prepared dataset, cleaning log, reproducible preparation steps | Planned |
+| 2 | Data cleaning and analytical preparation | Prepared dataset, cleaning log, reproducible preparation steps | In progress; Step 1 cleaning verified; derived fields and export pending |
 | 3 | Exploratory analysis and SQL validation | Question-led analysis, charts, reusable SQL queries | Planned |
 | 4 | Business interpretation and retention planning | Prioritised segments, recommendation matrix, experiment proposals | Planned |
 | 5 | Baseline predictive support | Benchmark comparison, evaluated model pipeline, outreach trade-offs | Planned |
@@ -145,6 +145,8 @@ flowchart TD
 **Deliverables:** Cleaned analytical dataset, preparation steps, validation summary, and cleaning decision log in `outputs/`.
 
 **Completion criterion:** Rerunning preparation from the raw file produces the same analytical table, and every excluded or altered record is accounted for.
+
+**Current progress:** Step 1 is implemented and verified in the notebook. The separate in-memory prepared table retains 7,043 rows and the 21 source fields, with numeric charge conversion, 11 missing totals, zero exclusions, and unchanged categories. Two fresh executions produced identical tables. See the [cleaning log](outputs/reports/analysis_log.md#phase-2-cleaning-decisions). Derived fields, bands, prepared schema, final export, and Phase 3 handoff are still pending.
 
 ### Phase 3: Exploratory analysis and SQL validation
 
@@ -260,7 +262,7 @@ CustomerChurnPrediction/
 |-- datasets/
 |   `-- TelecomChurnData.csv       # Raw input; preserve unchanged
 |-- notebooks/
-|   `-- churnprediction.ipynb      # Executed raw-data audit and six phase sections
+|   `-- churnprediction.ipynb      # Executed audit, Phase 2 Step 1, and later plans
 |-- sql/
 |   `-- README.md                 # Query plan; engine and queries pending
 |-- dashboard/
@@ -298,7 +300,7 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Open `notebooks/churnprediction.ipynb` in VS Code, select the `.venv` kernel, and run the cells in order. Launch from the repository root or a directory inside it; the notebook locates the raw CSV using project-relative paths. Current executable cells audit the raw data, verify its checksum, and read the reviewed data dictionary without rewriting it. They do not export files or generate cleaned data. Use **Restart Kernel**, then **Run All**, to check that the notebook works without state left over from earlier interactive runs. Save the notebook to retain the reviewed outputs. No separate Python runner is required.
+Open `notebooks/churnprediction.ipynb` in VS Code, select the `.venv` kernel, and run the cells in order. Launch from the repository root or a directory inside it; the notebook locates the raw CSV using project-relative paths. Current executable cells audit the raw data, verify its checksum, read the reviewed dictionary without rewriting it, and create the validated Step 1 prepared copy in memory. They do not export files. Use **Restart Kernel**, then **Run All**, to check that the notebook works without state left over from earlier interactive runs. Save the notebook to retain the reviewed aggregate outputs. No separate Python runner is required.
 
 Use `outputs/reports/analysis_log.md` to record decisions and findings as work progresses. Each notebook phase has a Markdown planning section, so future work can be added without placeholder executable code.
 
