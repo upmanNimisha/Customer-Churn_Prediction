@@ -178,6 +178,20 @@ Completed and verified on 10 November 2026 (Asia/Calcutta). Eleven focused code 
 
 **Phase 3 handoff:** Recreate the customer CSV by running the notebook if absent after checkout. Select/document a SQL engine and import schema using the prepared-data dictionary; translate empty totals to SQL NULL without changing denominators. Establish baseline and segment metrics, examine customer mix, report group sizes and uncertainty, and check band sensitivity. Reconcile SQL with pandas under identical filters/null rules before publishing charts or question-to-evidence findings. No database, SQL query implementation, dashboard, or model was added during Phase 2.
 
+### Code simplification review
+
+Reviewed on 10 November 2026 after Phase 2 completion. The notebook was simplified from 81 code cells / 641 source lines to 76 code cells / 574 source lines. No permanent Python helpers, dependencies, or frameworks were introduced.
+
+- Read the raw dictionary once; reuse its field definitions later in the audit.
+- Reuse the numeric candidate table and conversion diagnostics from Phase 1 instead of parsing the same values again in Phase 2.
+- Preserve the audited categories directly when no standardisation is needed. After checking exact categorical equality, reuse service flags instead of rebuilding the phone/internet rules.
+- Read and validate the tracked prepared-data dictionary rather than reconstructing reviewed metadata on each run. Its field order, types, complete documentation, and band category order are checked against the table; its contents remain unchanged.
+- Replace a conditional expression with an explicit band-to-source mapping, clarify final comparison variables, and simplify the validation-report header. The report still records all acceptance evidence; its reproduction text now describes read-only dictionaries.
+
+**Regression evidence:** A temporary script executed the original 81-cell notebook, then the simplified 76-cell notebook twice in fresh namespaces. Raw/prepared/reloaded tables, identifier/missingness/category/numeric/service/outcome audit results, conversion diagnostics, band summaries, counts, and rates matched exactly. Customer CSV bytes and both dictionary files were unchanged. Validation-report evidence matched, with only formatting and the updated dictionary-loading explanation changed. All cells remained within 15 lines. Isolated checks still rejected unknown churn/service values, negative/fractional/non-finite band inputs, altered IDs, changed missingness flags, and replacement of missing totals with zero. Raw CSV bytes remained unchanged, and saved outputs contain no customer IDs. Temporary scripts and the pre-refactor notebook snapshot were deleted after comparison.
+
+Phases 1 and 2 remain complete. Run the current notebook top to bottom to reproduce the analytical table and report; keep the tracked dictionaries as reviewed inputs. The earlier implementation records describe the original cell counts and metadata-generation workflow.
+
 ## Phase 3: Business answers and reconciliation
 
 | Business question | Finding and customer counts | Chart or query | Caveat | Decision supported |

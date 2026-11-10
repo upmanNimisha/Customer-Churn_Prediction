@@ -1,9 +1,7 @@
 # Phase 2 Validation Summary
 
 Reviewed: 10 November 2026 (Asia/Calcutta).
-
 Status: notebook acceptance checks passed; repeatability verification is recorded in analysis_log.md.
-
 Produced by notebooks/churnprediction.ipynb, Phase 2 Steps 1-3; unchanged supplied snapshot; all records retained.
 Environment: Python 3.14.6, pandas 3.1.1, NumPy 2.5.4.
 Input SHA-256: 88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a
@@ -39,7 +37,7 @@ Text/ID order, labels, flags, category order, and missingness match; numeric tol
 Raw file checksum, raw notebook views, and reviewed raw dictionary bytes remain unchanged.
 
 Reproduce: use the project .venv kernel, restart it, run the main notebook top to bottom, inspect and save aggregate outputs.
-The notebook recreates the customer CSV, prepared-data dictionary, and this report using project-relative paths.
+The notebook recreates the customer CSV and this report, and reads the reviewed dictionaries using project-relative paths.
 Repeatability evidence: see [analysis_log.md](analysis_log.md#step-3-final-reconciliation-export-and-phase-3-handoff).
 
 Limitations: provenance/licence, business grain, churn event/window, tenure units, and charge currency remain unverified.
