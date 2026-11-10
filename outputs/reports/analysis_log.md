@@ -1,6 +1,6 @@
 # Analysis working log
 
-Status: Phase 1 completed on 6 November 2026. Phase 2 Step 1 (prepared-copy cleaning) completed and verified on 7 November 2026. Phase 2 remains in progress; derived fields, bands, final export, and handoff remain planned. Documented source limitations still apply.
+Status: Phase 1 completed on 6 November 2026. Phase 2 Step 1 (prepared-copy cleaning) completed on 7 November; Step 2 (derived fields, bands, and prepared-data dictionary) completed and verified on 10 November 2026. Phase 2 remains in progress; final reconciliation, customer-table export, and handoff remain planned. Documented source limitations still apply.
 
 ## Phase 1: Business brief and quality audit
 
@@ -115,7 +115,44 @@ Counts refer to different field-level operations and must not be summed as disti
 
 **Step 1 result:** 7,043 rows and 21 columns; zero exclusions; 11 missing totals; all observed numeric values, identifier order, labels, categories, and service relationships preserved. These missing charges do not alter churn denominators. Provenance, usage conditions, business grain, churn window, and field units remain unresolved.
 
-**Next:** Step 2 adds the churn indicator, missing-total flag, analytical bands, and prepared-data dictionary. Step 3 performs final reconciliation, export/reload validation, and Phase 3 handoff. Phase 2 is not yet complete.
+**Step 1 handoff:** Step 2 below adds the churn indicator, missing-total flag, analytical bands, and prepared-data dictionary. Step 3 remains planned; Phase 2 is not yet complete.
+
+### Step 2: Derived fields, bands, and prepared-data dictionary
+
+Completed and verified on 10 November 2026 (Asia/Calcutta). Thirteen focused notebook code cells append four fields to `prepared_df`, resulting in 7,043 rows and 25 columns. The original 21 cleaned fields, their types, and identifier order remain unchanged. No customer-level table has been exported.
+
+| Field | Rule and rationale | Validation result |
+|---|---|---|
+| `churn_flag` | Exact Yes -> integer 1; No -> integer 0; reject unknown labels first | 1,869 ones; 5,174 zeros; no missing values |
+| `total_charges_missing` | Integer 1 for a missing prepared TotalCharges value; 0 otherwise; no imputation | 11 ones; exact row-by-row agreement with missing totals |
+| `tenure_band` | Fixed ordered labels: 0; 1-12; 13-24; 25-48; 49+; Missing | Zero has its own group; remaining intervals include their upper edge; all records assigned |
+| `monthly_charge_band` | Fixed ordered labels: Below 35; 35 to below 70; 70 to below 100; 100+; Missing | Lower edges inclusive, upper edges exclusive; all records assigned |
+
+The fixed boundaries were specified in the preparation plan before segment churn comparisons. They are analyst conventions, not source-verified business thresholds. Tenure uses recorded units; charge currency remains unverified. The missing groups are defined explicitly and currently contain zero records. Negative/non-finite observed inputs and fractional tenure fail validation. Phase 3 will check sensitivity to reasonable alternative boundaries before interpreting priorities.
+
+**Assignment reconciliation (not a ranking or business finding):**
+
+| Partition | Band | Customers | Churners |
+|---|---|---|---|
+| Tenure | 0 | 11 | 0 |
+| Tenure | 1-12 | 2,175 | 1,037 |
+| Tenure | 13-24 | 1,024 | 294 |
+| Tenure | 25-48 | 1,594 | 325 |
+| Tenure | 49+ | 2,239 | 213 |
+| Tenure | Missing | 0 | 0 |
+| MonthlyCharges | Below 35 | 1,731 | 188 |
+| MonthlyCharges | 35 to below 70 | 1,721 | 407 |
+| MonthlyCharges | 70 to below 100 | 2,683 | 1,017 |
+| MonthlyCharges | 100+ | 908 | 257 |
+| MonthlyCharges | Missing | 0 | 0 |
+
+Each partition separately totals 7,043 customers and 1,869 churners; do not add the two partitions together. All eligible IDs and valid labels stay in churn denominators, including customers with missing totals. Keep exact counts and unrounded calculations, show missing groups explicitly, and disclose charge coverage separately. Overlapping segments must not be summed as distinct customers.
+
+**Metadata deliverable:** [prepared_data_dictionary.csv](prepared_data_dictionary.csv), exported from the Step 2 notebook cells with UTF-8 and no index. It describes all 25 fields, actual pandas types, reused source descriptions and observed values/ranges, transformations, null handling, interval edges, category order, and interpretation caveats. The reviewed raw dictionary is unchanged. Observed vocabulary is not a verified source-wide list of permitted values. SQL and Power BI must apply this schema and order explicitly because CSV does not retain pandas types or ordered categories.
+
+**Verification:** A temporary script executed all 70 notebook code cells twice in fresh IPython namespaces using the existing project environment. Prepared tables matched exactly, including types, categories, and row order; exported dictionary bytes matched between runs and reloaded metadata matched the in-memory dictionary. Independent standard-library CSV calculations agreed with each band's customer counts. Tests ran the actual notebook band cells on zero, interval edges, adjacent values, higher values, and missing inputs. Exact 35/70/100 charges entered their next band; exact 12/24/48 tenure entered their upper-inclusive band. Negative/infinite inputs, fractional tenure, and an unknown churn label were rejected. Source bytes, raw dictionary bytes, raw views, and the 21 cleaned source columns remained unchanged. Saved outputs contain aggregate results without customer identifiers. Temporary editing and verification scripts were removed after checking.
+
+**Next:** Step 3 will complete final reconciliation, export/reload the analytical customer table, publish its validation summary, and prepare the Phase 3 handoff. No learned preprocessing, models, or Phase 3 business conclusions were added in Step 2.
 
 ## Phase 3: Business answers and reconciliation
 
