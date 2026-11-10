@@ -2,7 +2,7 @@
 
 A data analyst project that uses telecom customer data to understand churn patterns, identify priority customer segments, and translate findings into practical retention recommendations. A baseline prediction model will support the analysis by testing whether customer characteristics can help prioritise outreach.
 
-> **Project status: Phase 1 complete; Phase 2 Steps 1 and 2 complete.** The notebook creates a validated analytical copy with 7,043 rows and 25 fields, including the churn indicator, missing-total flag, and ordered tenure/charge bands. The 11 unknown totals remain missing, with no exclusions or imputation. A separate prepared-data dictionary documents the schema. Final reconciliation, customer-table export, and handoff remain planned. Source provenance, usage conditions, business definitions, and units remain explicitly unresolved.
+> **Project status: Phases 1 and 2 complete; ready for Phase 3 exploratory analysis and SQL validation.** The notebook produces and reloads `outputs/data/customer_analytical.csv`: 7,043 rows and 25 fields, with zero exclusions and 11 unknown totals kept missing. The prepared-data dictionary and validation summary document the schema and acceptance checks. Two fresh executions reproduced the table and all three output artifacts exactly. Source provenance, usage conditions, business definitions, and units remain explicitly unresolved.
 
 ## Business objective
 
@@ -89,7 +89,7 @@ Each phase has a question to answer, a defined output, and a completion criterio
 | Phase | Focus | Primary deliverables | Status |
 |---|---|---|---|
 | 1 | Business framing and data audit | Analysis brief, data dictionary, quality report | Complete; unresolved source limitations documented |
-| 2 | Data cleaning and analytical preparation | Prepared dataset, cleaning log, reproducible preparation steps | In progress; Steps 1 and 2 verified; final export and handoff pending |
+| 2 | Data cleaning and analytical preparation | Prepared dataset, cleaning log, reproducible preparation steps | Complete; export/reload and repeatability verified |
 | 3 | Exploratory analysis and SQL validation | Question-led analysis, charts, reusable SQL queries | Planned |
 | 4 | Business interpretation and retention planning | Prioritised segments, recommendation matrix, experiment proposals | Planned |
 | 5 | Baseline predictive support | Benchmark comparison, evaluated model pipeline, outreach trade-offs | Planned |
@@ -146,7 +146,7 @@ flowchart TD
 
 **Completion criterion:** Rerunning preparation from the raw file produces the same analytical table, and every excluded or altered record is accounted for.
 
-**Current progress:** Steps 1 and 2 are implemented and verified in the notebook. The in-memory table has 7,043 rows and 25 fields: the 21 cleaned source fields plus `churn_flag`, `total_charges_missing`, `tenure_band`, and `monthly_charge_band`. The 11 unknown totals remain missing; zero records are excluded. Two fresh executions of all 70 code cells produced identical analytical tables and [prepared-data dictionaries](outputs/reports/prepared_data_dictionary.csv). Both band partitions reconcile to the same customer and churn totals. See the [cleaning log](outputs/reports/analysis_log.md#phase-2-cleaning-decisions). Final reconciliation, customer-table export/reload checks, and Phase 3 handoff remain pending.
+**Completed:** All three preparation steps are implemented in the notebook. The exported/reloaded table has 7,043 rows and 25 fields: the 21 cleaned source fields plus `churn_flag`, `total_charges_missing`, `tenure_band`, and `monthly_charge_band`. Zero records are excluded; 11 unknown totals remain missing and flagged. Two fresh executions of all 81 code cells produced identical analytical tables, customer CSVs, [prepared-data dictionaries](outputs/reports/prepared_data_dictionary.csv), and [validation summaries](outputs/reports/phase_2_validation_summary.md). Both band partitions reconcile to 7,043 customers and 1,869 churners (26.54% overall). See the [cleaning log and Phase 3 handoff](outputs/reports/analysis_log.md#step-3-final-reconciliation-export-and-phase-3-handoff).
 
 ### Phase 3: Exploratory analysis and SQL validation
 
@@ -262,7 +262,7 @@ CustomerChurnPrediction/
 |-- datasets/
 |   `-- TelecomChurnData.csv       # Raw input; preserve unchanged
 |-- notebooks/
-|   `-- churnprediction.ipynb      # Executed audit, Phase 2 Steps 1-2, and later plans
+|   `-- churnprediction.ipynb      # Completed audit/preparation; later-phase plans
 |-- sql/
 |   `-- README.md                 # Query plan; engine and queries pending
 |-- dashboard/
@@ -276,6 +276,7 @@ CustomerChurnPrediction/
 |       |-- analysis_brief.md      # Business scope, questions, and metrics
 |       |-- data_dictionary.csv    # Observed profiles; source semantics unverified
 |       |-- prepared_data_dictionary.csv # Prepared types, derivations, bands, null rules
+|       |-- phase_2_validation_summary.md # Export/reload and acceptance evidence
 |       |-- data_quality_report.md # Issues, preparation rules, and Phase 2 handoff
 |       `-- analysis_log.md        # Audit, cleaning, findings, and action templates
 |-- requirements.txt              # Current pinned Python dependencies
@@ -301,7 +302,9 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Open `notebooks/churnprediction.ipynb` in VS Code, select the `.venv` kernel, and run the cells in order. Launch from the repository root or a directory inside it; the notebook locates the raw CSV using project-relative paths. Current executable cells audit the raw data, verify its checksum, preserve the reviewed raw dictionary, prepare the analytical table in memory, and export/reload `outputs/reports/prepared_data_dictionary.csv`. They do not export customer-level data yet. Use **Restart Kernel**, then **Run All**, to check that the notebook works without state left over from earlier interactive runs. Save the notebook to retain the reviewed aggregate outputs. No separate Python runner is required.
+Open `notebooks/churnprediction.ipynb` in VS Code, select the `.venv` kernel, and run the cells in order. Launch from the repository root or a directory inside it; the notebook locates the raw CSV using project-relative paths. Current executable cells audit and prepare the data, preserve the raw file/dictionary, export/reload `outputs/data/customer_analytical.csv` and `outputs/reports/prepared_data_dictionary.csv`, and generate `outputs/reports/phase_2_validation_summary.md`. Use **Restart Kernel**, then **Run All**, to reproduce these artifacts without state from earlier interactive runs. Save reviewed aggregate outputs without customer-level previews. No separate Python runner is required. The customer CSV is ignored by Git and must be regenerated after a fresh checkout.
+
+Load the analytical CSV as UTF-8 with a header and no index. Preserve IDs and categorical labels as literal text; treat only empty `TotalCharges` fields as numeric missing values. Convert numeric fields explicitly using the prepared-data dictionary, rejecting malformed text. Restore ordered band categories from the dictionary, including their explicit `Missing` labels; do not sort them alphabetically. The notebook's Phase 2 Step 3 demonstrates these loading rules and verifies the complete reloaded table with numeric tolerances `rtol=1e-12`, `atol=1e-10`. SQL and Power BI must use the same definitions and denominators; engine-specific loading and reconciliation remain Phase 3 work.
 
 Use `outputs/reports/analysis_log.md` to record decisions and findings as work progresses. Each notebook phase has a Markdown planning section, so future work can be added without placeholder executable code.
 

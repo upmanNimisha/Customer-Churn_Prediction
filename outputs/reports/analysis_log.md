@@ -1,6 +1,6 @@
 # Analysis working log
 
-Status: Phase 1 completed on 6 November 2026. Phase 2 Step 1 (prepared-copy cleaning) completed on 7 November; Step 2 (derived fields, bands, and prepared-data dictionary) completed and verified on 10 November 2026. Phase 2 remains in progress; final reconciliation, customer-table export, and handoff remain planned. Documented source limitations still apply.
+Status: Phases 1 and 2 complete. Phase 2 Step 1 completed on 7 November; Steps 2 and 3 completed and verified on 10 November 2026. Final export/reload and repeatability checks passed. Ready for Phase 3 exploratory analysis and SQL validation. Documented source limitations still apply.
 
 ## Phase 1: Business brief and quality audit
 
@@ -152,7 +152,31 @@ Each partition separately totals 7,043 customers and 1,869 churners; do not add 
 
 **Verification:** A temporary script executed all 70 notebook code cells twice in fresh IPython namespaces using the existing project environment. Prepared tables matched exactly, including types, categories, and row order; exported dictionary bytes matched between runs and reloaded metadata matched the in-memory dictionary. Independent standard-library CSV calculations agreed with each band's customer counts. Tests ran the actual notebook band cells on zero, interval edges, adjacent values, higher values, and missing inputs. Exact 35/70/100 charges entered their next band; exact 12/24/48 tenure entered their upper-inclusive band. Negative/infinite inputs, fractional tenure, and an unknown churn label were rejected. Source bytes, raw dictionary bytes, raw views, and the 21 cleaned source columns remained unchanged. Saved outputs contain aggregate results without customer identifiers. Temporary editing and verification scripts were removed after checking.
 
-**Next:** Step 3 will complete final reconciliation, export/reload the analytical customer table, publish its validation summary, and prepare the Phase 3 handoff. No learned preprocessing, models, or Phase 3 business conclusions were added in Step 2.
+**Step 2 handoff:** Step 3 below completes final reconciliation, export/reload verification, the validation summary, and Phase 3 handoff. No learned preprocessing, models, or Phase 3 business conclusions were added in Step 2.
+
+### Step 3: Final reconciliation, export, and Phase 3 handoff
+
+Completed and verified on 10 November 2026 (Asia/Calcutta). Eleven focused code cells in the main notebook complete preparation without separate permanent Python helpers. All new cells have Markdown explanations and at most 15 lines. The analytical table is exported only after source-field, count, flag, partition, and preservation checks pass.
+
+| Deliverable | Contents and verification |
+|---|---|
+| `outputs/data/customer_analytical.csv` | UTF-8, header, no pandas index, fixed source row order and 25 fields; 11 unknown totals stored as empty fields; generated customer-level data ignored by Git |
+| [prepared_data_dictionary.csv](prepared_data_dictionary.csv) | All 25 fields, types, transformations, null rules, exact band edges/order, and interpretation caveats; unchanged by the Step 3 verification |
+| [phase_2_validation_summary.md](phase_2_validation_summary.md) | Notebook-generated aggregate reconciliation, input/export hashes, environment, acceptance results, reload rules, limitations, and next-phase tasks |
+
+**Final results:** 7,043 rows and unique IDs, 1,869 Yes/ones, 5,174 No/zeros, 26.54% recorded-label prevalence, zero exclusions, zero categorical changes, zero changes to observed numeric values. TotalCharges representation conversion accounts for 7,032 numeric strings and 11 blank-to-missing values. MonthlyCharges has zero missing values; all 11 missing totals remain flagged and included in churn denominators. No imputation or capping occurred. Both band partitions reconcile to 7,043 customers and 1,869 churners, with explicit empty Missing groups. Source row order, raw views, raw file checksum, reviewed dictionary bytes, and all cleaned source columns remain unchanged.
+
+**Loading contract:** Start with literal string loading (UTF-8, `dtype=str`, `keep_default_na=False`, `na_filter=False`) to preserve IDs and category spelling. Replace only empty TotalCharges fields with numeric missing values, then explicitly convert the three numeric measures, SeniorCitizen, and the two integer flags using `errors="raise"`. Reject labels outside the documented band vocabulary before restoring ordered categoricals. Retain no-service states. Verify the complete table, IDs/order, flags, and missingness against preparation. Floating-point CSV comparisons permit only `rtol=1e-12`, `atol=1e-10`; text and categories remain exact.
+
+**Repeatability verification:** A temporary script executed all 81 notebook code cells twice in fresh IPython namespaces using Python 3.14.6, pandas 3.1.1, and NumPy 2.5.4. Both executions passed. Prepared tables matched exactly, including types/order, and all three generated artifacts matched byte for byte. Independent standard-library CSV checks reconciled 7,043 rows, 25 fields, exact raw identifier order, labels/flags, and 11 physically empty totals. Isolated reload checks rejected an altered ID, an unknown tenure-band label, a changed missingness flag, and replacement of a missing total with zero. Aggregate outputs contain no customer identifiers. Temporary editing and verification scripts were removed after checking; analytical logic and exports remain in notebook cells.
+
+**Input SHA-256:** `88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a`.
+
+**Analytical export SHA-256:** `b27a6d5a9aa9cf730090a61c5d4779bdc7de15fff5f7dd2eed2d8c2948f374f2`.
+
+**Completion decision:** Phase 2 is complete. A fresh run from the unchanged raw file recreates the analytical table, metadata, and validation evidence; every alteration and exclusion is accounted for. Source provenance/licence, business grain, churn event/window, tenure units, and charge currency remain unresolved and constrain interpretation. These checks do not establish future-window prediction, causal effects, or operational readiness.
+
+**Phase 3 handoff:** Recreate the customer CSV by running the notebook if absent after checkout. Select/document a SQL engine and import schema using the prepared-data dictionary; translate empty totals to SQL NULL without changing denominators. Establish baseline and segment metrics, examine customer mix, report group sizes and uncertainty, and check band sensitivity. Reconcile SQL with pandas under identical filters/null rules before publishing charts or question-to-evidence findings. No database, SQL query implementation, dashboard, or model was added during Phase 2.
 
 ## Phase 3: Business answers and reconciliation
 
